@@ -17,9 +17,9 @@ interface Contact {
 }
 
 interface Article {
-  id?: number;
-  title: string;
-  content: string;
+  article_id?: string;
+  name: string;
+  unit_price: string;
 }
 
 interface AppContextType {

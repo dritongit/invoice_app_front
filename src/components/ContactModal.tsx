@@ -1,5 +1,6 @@
 import React, { useContext, useRef } from "react";
 import { AppContext } from "../context/AppContext";
+import { v4 as uuidv4 } from "uuid";
 
 interface ModalProps {
   isOpen: boolean;
@@ -22,7 +23,7 @@ const ContactModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     if (!nameRef.current || !emailRef.current || !phoneRef.current) return;
 
     const newContact = {
-      contact_id: "543rt5",
+      contact_id: uuidv4(),
       name: nameRef.current.value,
       alternative: emailRef.current.value,
       email1: phoneRef.current.value,
@@ -40,8 +41,8 @@ const ContactModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         <h2>Create Contact</h2>
         <form onSubmit={handleSubmit}>
           <input type="text" ref={nameRef} placeholder="Name" required />
-          <input type="email" ref={emailRef} placeholder="Email" required />
-          <input type="text" ref={phoneRef} placeholder="Phone" required />
+          <input type="email" ref={emailRef} placeholder="alternative" required />
+          <input type="text" ref={phoneRef} placeholder="email1" required />
           <button type="submit">Save Contact</button>
           <button type="button" className="close-btn" onClick={onClose}>
             Close

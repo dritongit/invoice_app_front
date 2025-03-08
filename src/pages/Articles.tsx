@@ -10,14 +10,44 @@ const Articles = () => {
   return (
     <div>
       <h2>Articles</h2>
-      <ul>
-        {articles.map((article) => (
-          <li key={article.id}>
-            <h3>{article.title}</h3>
-            <p>{article.content}</p>
-          </li>
-        ))}
-      </ul>
+      <div className="tab-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Taxed</th>
+                                <th>Rate %</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                                <th>Tax</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {articles.map((article) => (
+                                <tr key={article.article_id}>
+                                  <td>{article.name}</td>7
+                                  <td>1</td>
+                                  <td>1</td>
+                                  <td>1</td>
+                                  {/* <td><input type="checkbox" /></td> */}
+                                  <td>{article.unit_price}</td>
+                                  <td>1</td>
+                                  <td>1</td>
+                                </tr>
+                              ))}
+                            <tr>
+                                <td>Birra Peja</td>
+                                <td><input type="checkbox" /></td>
+                                <td>18.00</td>
+                                <td>1</td>
+                                <td>12.00</td>
+                                <td>12.00</td>
+                                <td>12.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
     </div>
   );
 };
