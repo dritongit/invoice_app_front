@@ -1,7 +1,12 @@
 import React, { useContext, useRef } from "react";
 import { AppContext } from "../context/AppContext";
 
-const InvoiceModal = () => {
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const InvoiceModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const context = useContext(AppContext);
 
   const clientRef = useRef<HTMLInputElement>(null);
@@ -9,10 +14,8 @@ const InvoiceModal = () => {
   const statusRef = useRef<HTMLInputElement>(null);
   
   if (!context) return null;
-//   const { addInvoice, isInvoiceModalOpen, closeInvoiceModal } = context;
+  
   const { addInvoice } = context;
-
-
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,10 +28,10 @@ const InvoiceModal = () => {
     };
 
     addInvoice(newInvoice);
-    // closeInvoiceModal();
+    onClose();
   };
 
-//   if (!isInvoiceModalOpen) return null;
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">
@@ -39,8 +42,7 @@ const InvoiceModal = () => {
           <input type="number" ref={amountRef} placeholder="Amount" required />
           <input type="text" ref={statusRef} placeholder="Status" required />
           <button type="submit">Save Invoice</button>
-          {/* <button type="button" className="close-btn" onClick={closeInvoiceModal}> */}
-          <button type="button" className="close-btn" >
+          <button type="button" className="close-btn" onClick={onClose}>
             Close
           </button>
         </form>

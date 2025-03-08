@@ -51,8 +51,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const fetchContacts = async () => {
-
-
     try {
       const response = await axios.get("/contacts");
       setContacts([...response.data, ...getOfflineContacts()]);
@@ -82,7 +80,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       fetchContacts();
     } else {
       saveOfflineContact(contact);
-      setContacts((prev) => [...prev, contact]);
+      setContacts((prev) => [contact, ...prev]);
     }
   };
 
@@ -101,12 +99,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return JSON.parse(localStorage.getItem("offlineContacts") || "[]");
   };
 
+  const syncOfflineContacts = async () => {
+    const offlineContacts = getOfflineContacts();
+    if (offlineContacts.length === 0) return;
+    for (const contact of offlineContacts) {
+      try {
+        await addContact(contact); //  Send each contact to backend
+      } catch (error) {
+      }
+    }
+  
+    // ✅ Clear offline contacts after successful sync
+    localStorage.removeItem("offlineContacts");
+    fetchContacts(); // ✅ Refresh the contact list
+  };
+  
+
   useEffect(() => {
     fetchInvoices();
     fetchContacts();
     fetchArticles();
 
-    window.addEventListener("online", fetchContacts);
+    window.addEventListener("online", syncOfflineContacts);
     return () => {
       window.removeEventListener("online", fetchContacts);
     };

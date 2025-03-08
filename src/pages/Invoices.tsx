@@ -1,18 +1,17 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import InvoiceModal from "../components/InvoiceModal";
 
 const Invoices = () => {
   const context = useContext(AppContext);
+  const [isModalOpen, setModalOpen] = useState(false);
   if (!context) return <p>Loading...</p>;
-//   const { invoices, openInvoiceModal } = context;
   const { invoices } = context;
 
   return (
     <div>
       <h2>Invoices</h2>
-      {/* <button onClick={openInvoiceModal}>+ Add Invoice</button> ✅ Menaxhohet nga Context */}
-      <button >+ Add Invoice</button> {/* ✅ Menaxhohet nga Context */}
+      <button onClick={() => setModalOpen(true)}>+ Add Invoice</button>
 
       <ul>
         {invoices.map((invoice) => (
@@ -21,8 +20,7 @@ const Invoices = () => {
           </li>
         ))}
       </ul>
-
-      <InvoiceModal /> {/* ✅ Modali menaxhohet nga Context */}
+      <InvoiceModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 };
