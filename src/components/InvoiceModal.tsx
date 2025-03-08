@@ -1,5 +1,6 @@
 import React, { useContext, useRef } from "react";
 import { AppContext } from "../context/AppContext";
+import { v4 as uuidv4 } from "uuid";
 
 interface ModalProps {
   isOpen: boolean;
@@ -22,9 +23,10 @@ const InvoiceModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     if (!clientRef.current || !amountRef.current || !statusRef.current) return;
 
     const newInvoice = {
-      client: clientRef.current.value,
-      amount: parseFloat(amountRef.current.value),
-      status: statusRef.current.value,
+      invoice_id: uuidv4(),
+      name: clientRef.current.value,
+      alternative: amountRef.current.value,
+      total_unit_price: parseFloat(amountRef.current.value)
     };
 
     addInvoice(newInvoice);

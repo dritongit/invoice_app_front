@@ -2,10 +2,10 @@ import React, { createContext, useState, useEffect, ReactNode } from "react";
 import axios from "../utils/axiosInstance";
 
 interface Invoice {
-  id?: number;
-  client: string;
-  amount: number;
-  status: string;
+  invoice_id: string;
+  name: string;
+  alternative: string;
+  total_unit_price: number;
 }
 
 interface Contact {
@@ -26,12 +26,15 @@ interface AppContextType {
   invoices: Invoice[];
   contacts: Contact[];
   articles: Article[];
+  currentPage: number,
+  totalPages: number,
   fetchInvoices: () => void;
   fetchContacts: () => void;
   fetchArticles: () => void;
-  addInvoice: (invoice: Omit<Invoice, "id">) => void;
+  addInvoice: (invoice: Omit<Invoice, "invoice_id">) => void;
   addContact: (contact: Omit<Contact, "contact_id">) => void;
   addArticle: (article: Omit<Article, "id">) => void;
+  setCurrentPage: (page: number) => void;
 }
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -41,10 +44,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
 
-  const fetchInvoices = async () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10; // Records per page
+
+  const fetchInvoices = async (page = 1) => {
     try {
-      const response = await axios.get("/invoices");
-      setInvoices(response.data);
+      const response = await axios.get(`/invoices?page=${page}&limit=${limit}`);
+      setInvoices(response.data.data);
+      setTotalPages(Math.ceil(response.data.total / limit));
+
+      // const response = await axios.get("/invoices");
+      setInvoices(response.data.data);
     } catch (error) {
       console.error("Error fetching invoices", error);
     }
@@ -69,7 +80,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  const addInvoice = async (invoice: Omit<Invoice, "id">) => {
+  const addInvoice = async (invoice: Omit<Invoice, "invoice_id">) => {
     await axios.post("/invoice_add", invoice);
     fetchInvoices();
   };
@@ -116,7 +127,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   
 
   useEffect(() => {
-    fetchInvoices();
+    fetchInvoices(currentPage);
     fetchContacts();
     fetchArticles();
 
@@ -124,7 +135,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return () => {
       window.removeEventListener("online", fetchContacts);
     };
-  }, []);
+  }, [currentPage]);
 
   return (
     <AppContext.Provider
@@ -132,12 +143,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         invoices,
         contacts,
         articles,
+        currentPage, 
+        totalPages, 
+        setCurrentPage,
         fetchInvoices,
         fetchContacts,
         fetchArticles,
         addInvoice,
         addContact,
-        addArticle,
+        addArticle
       }}
     >
       {children}

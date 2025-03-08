@@ -27,28 +27,26 @@ const Articles = () => {
                       </tr>
                   </thead>
                   <tbody>
-                      {articles.map((article) => (
-                          <tr key={article.article_id}>
-                            <td>{article.name}</td>7
-                            <td>1</td>
-                            <td>1</td>
-                            <td>1</td>
-                            {/* <td><input type="checkbox" /></td> */}
-                            <td>{article.unit_price}</td>
-                            <td>1</td>
-                            <td>1</td>
-                          </tr>
-                        ))}
-                      <tr>
-                          <td>Birra Peja</td>
-                          <td><input type="checkbox" /></td>
-                          <td>18.00</td>
-                          <td>1</td>
-                          <td>12.00</td>
-                          <td>12.00</td>
-                          <td>12.00</td>
+                  {articles && articles.length > 0 ? (
+                    articles.map((article) => (
+                      <tr key={article.article_id}>
+                        <td>{article.name}</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>{article.unit_price}</td>
+                        <td>1</td>
+                        <td>1</td>
                       </tr>
-                  </tbody>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={7} style={{ textAlign: "center", padding: "10px" }}>
+                        No Data Available
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
               </table>
           </div>
           <ArticleModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
