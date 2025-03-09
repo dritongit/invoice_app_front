@@ -24,9 +24,12 @@ const InvoiceModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
     const newInvoice = {
       invoice_id: uuidv4(),
+      created_at: '',
       name: clientRef.current.value,
       alternative: amountRef.current.value,
-      total_unit_price: parseFloat(amountRef.current.value)
+      total_unit_price: parseFloat(amountRef.current.value),
+      total_payment: 0,
+      balance: 0
     };
 
     addInvoice(newInvoice);

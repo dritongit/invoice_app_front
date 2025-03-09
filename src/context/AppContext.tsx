@@ -3,9 +3,12 @@ import axios from "../utils/axiosInstance";
 
 interface Invoice {
   invoice_id: string;
+  created_at: string;
   name: string;
   alternative: string;
   total_unit_price: number;
+  total_payment: number;
+  balance: number;
 }
 
 interface Contact {
@@ -28,13 +31,17 @@ interface AppContextType {
   articles: Article[];
   currentPage: number,
   totalPages: number,
-  fetchInvoices: () => void;
+  sortColumn: string,
+  sortOrder: string,
+  fetchInvoices: (page?: number, sortColumn?: string, sortOrder?: string) => void;
   fetchContacts: () => void;
   fetchArticles: () => void;
   addInvoice: (invoice: Omit<Invoice, "invoice_id">) => void;
   addContact: (contact: Omit<Contact, "contact_id">) => void;
   addArticle: (article: Omit<Article, "id">) => void;
   setCurrentPage: (page: number) => void;
+  setSortColumn:(sortColumn: string) => void,
+  setSortOrder:(sortOrder: string) => void,
 }
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -46,21 +53,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const [sortColumn, setSortColumn] = useState("i.created_at");
+  const [sortOrder, setSortOrder] = useState("DESC");
   const limit = 10; // Records per page
 
-  const fetchInvoices = async (page = 1) => {
+  const fetchInvoices = async (page = 1, sortColumn = "i.created_at", sortOrder = "DESC") => {
     try {
-      const response = await axios.get(`/invoices?page=${page}&limit=${limit}`);
+      const response = await axios.get(`/invoices`, {
+        params: {
+          page,
+          limit,
+          sortColumn,
+          sortOrder
+        }
+      });
+  
       setInvoices(response.data.data);
-      setTotalPages(Math.ceil(response.data.total / limit));
-
-      // const response = await axios.get("/invoices");
-      setInvoices(response.data.data);
+      setTotalPages(Math.ceil((response.data.total || 0) / limit));
     } catch (error) {
       console.error("Error fetching invoices", error);
     }
   };
-
+  
   const fetchContacts = async () => {
     try {
       const response = await axios.get("/contacts");
@@ -127,7 +142,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   
 
   useEffect(() => {
-    fetchInvoices(currentPage);
+    fetchInvoices(currentPage, sortColumn, sortOrder);
     fetchContacts();
     fetchArticles();
 
@@ -135,7 +150,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return () => {
       window.removeEventListener("online", fetchContacts);
     };
-  }, [currentPage]);
+    
+  }, [currentPage, sortColumn, sortOrder]);
 
   return (
     <AppContext.Provider
@@ -145,13 +161,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         articles,
         currentPage, 
         totalPages, 
+        sortColumn,
+        sortOrder,
         setCurrentPage,
         fetchInvoices,
         fetchContacts,
         fetchArticles,
         addInvoice,
         addContact,
-        addArticle
+        addArticle,
+        setSortColumn,
+        setSortOrder
       }}
     >
       {children}
