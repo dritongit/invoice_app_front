@@ -1,5 +1,6 @@
 import React, { useContext, useRef } from "react";
 import { AppContext } from "../context/AppContext";
+import { AuthContext } from "../context/AuthContext";
 import { v4 as uuidv4 } from "uuid";
 
 interface ModalProps {
@@ -9,6 +10,7 @@ interface ModalProps {
 
 const ContactModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const context = useContext(AppContext);
+  const authContext = useContext(AuthContext);
   
   // Move useRef calls outside the conditional block
   const nameRef = useRef<HTMLInputElement>(null);
@@ -17,6 +19,9 @@ const ContactModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   if (!context) return null;
   const { addContact } = context;
+  // const { userSettings } = authContext;
+  if (!authContext) return null;
+  const { userSettings } = authContext;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +48,7 @@ const ContactModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           <input type="text" ref={nameRef} placeholder="Name" required />
           <input type="email" ref={emailRef} placeholder="alternative" required />
           <input type="text" ref={phoneRef} placeholder="email1" required />
+          <p>{userSettings?.settings_tax_rate || "Not Set"}</p>
           <button type="submit">Save Contact</button>
           <button type="button" className="close-btn" onClick={onClose}>
             Close

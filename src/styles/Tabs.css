@@ -1,0 +1,38 @@
+.tabs-container {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .tab-btn {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    background: lightgray;
+    transition: 0.3s;
+  }
+  
+  .tab-btn.active {
+    background: #007bff;
+    color: white;
+  }
+  
+  .tab-contents {
+    padding: 20px;
+    border: 1px solid #ddd;
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+  }
+  
