@@ -11,7 +11,7 @@ interface Invoice {
   balance: number;
 }
 
-interface Contact {
+export interface Contact {
   contact_id?: string;
   name: string;
   alternative: string;
@@ -29,10 +29,10 @@ interface AppContextType {
   invoices: Invoice[];
   contacts: Contact[];
   articles: Article[];
-  currentPage: number,
-  totalPages: number,
-  sortColumn: string,
-  sortOrder: string,
+  currentPage: number;
+  totalPages: number;
+  sortColumn: string;
+  sortOrder: string;
   fetchInvoices: (page?: number, sortColumn?: string, sortOrder?: string) => void;
   fetchContacts: () => void;
   fetchArticles: () => void;
@@ -40,8 +40,10 @@ interface AppContextType {
   addContact: (contact: Omit<Contact, "contact_id">) => void;
   addArticle: (article: Omit<Article, "id">) => void;
   setCurrentPage: (page: number) => void;
-  setSortColumn:(sortColumn: string) => void,
-  setSortOrder:(sortOrder: string) => void,
+  setSortColumn: (sortColumn: string) => void;
+  setSortOrder: (sortOrder: string) => void;
+  searchContacts: (query: string) => void;
+  searchResults: Contact[];
 }
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -50,10 +52,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
+  const [searchResults, setSearchResults] = useState<Contact[]>([]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
   const [sortColumn, setSortColumn] = useState("i.created_at");
   const [sortOrder, setSortOrder] = useState("DESC");
   const limit = 10; // Records per page
@@ -61,21 +63,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const fetchInvoices = async (page = 1, sortColumn = "i.created_at", sortOrder = "DESC") => {
     try {
       const response = await axios.get(`/invoices`, {
-        params: {
-          page,
-          limit,
-          sortColumn,
-          sortOrder
-        }
+        params: { page, limit, sortColumn, sortOrder },
       });
-  
       setInvoices(response.data.data);
       setTotalPages(Math.ceil((response.data.total || 0) / limit));
     } catch (error) {
       console.error("Error fetching invoices", error);
     }
   };
-  
+
   const fetchContacts = async () => {
     try {
       const response = await axios.get("/contacts");
@@ -92,6 +88,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setArticles(response.data);
     } catch (error) {
       console.error("Error fetching articles", error);
+    }
+  };
+
+  const searchContacts = async (query: string) => {
+    if (!query) {
+      setSearchResults([]);
+      return;
+    }
+    try {
+      const response = await axios.get(`/contacts?search=${query}`);
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error("Error searching contacts", error);
+      setSearchResults([]);
     }
   };
 
@@ -130,28 +140,30 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (offlineContacts.length === 0) return;
     for (const contact of offlineContacts) {
       try {
-        await addContact(contact); //  Send each contact to backend
-      } catch (error) {
-      }
+        await addContact(contact);
+      } catch (error) {}
     }
-  
-    // ✅ Clear offline contacts after successful sync
     localStorage.removeItem("offlineContacts");
-    fetchContacts(); // ✅ Refresh the contact list
+    fetchContacts();
   };
-  
 
   useEffect(() => {
     fetchInvoices(currentPage, sortColumn, sortOrder);
-    fetchContacts();
-    fetchArticles();
-
-    window.addEventListener("online", syncOfflineContacts);
-    return () => {
-      window.removeEventListener("online", fetchContacts);
-    };
-    
   }, [currentPage, sortColumn, sortOrder]);
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  //Sync Offline Contacts When Online
+  useEffect(() => {
+    window.addEventListener("online", syncOfflineContacts);
+    return () => window.removeEventListener("online", syncOfflineContacts);
+  }, []);
 
   return (
     <AppContext.Provider
@@ -159,10 +171,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         invoices,
         contacts,
         articles,
-        currentPage, 
-        totalPages, 
+        currentPage,
+        totalPages,
         sortColumn,
         sortOrder,
+        searchResults,
         setCurrentPage,
         fetchInvoices,
         fetchContacts,
@@ -171,7 +184,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         addContact,
         addArticle,
         setSortColumn,
-        setSortOrder
+        setSortOrder,
+        searchContacts,
       }}
     >
       {children}

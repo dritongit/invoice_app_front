@@ -13,7 +13,7 @@ const Articles = () => {
     <div>
       <h2>Articles</h2>
       <button onClick={() => setModalOpen(true)}>+ Add Contact</button>
-      <div className="tab-content">
+      <div className="items">
               <table>
                   <thead>
                       <tr>

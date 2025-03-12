@@ -12,7 +12,6 @@ const ContactModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const context = useContext(AppContext);
   const authContext = useContext(AuthContext);
   
-  // Move useRef calls outside the conditional block
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);

@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 import "../../styles/App.css";
 import "../../styles/Extra.css";
 import "../../styles/Modal.css";
+import "../../styles/ContactSearch.css";
 
 const Layout = () => {
   return (

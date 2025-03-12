@@ -1,0 +1,28 @@
+.contact-search-container {
+    position: relative;
+}
+
+.search-input {
+}
+
+ul.search-results {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    width: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+ul.search-results li {
+    padding: 8px;
+    cursor: pointer;
+}
+
+ul.search-results li:hover {
+    background: #f0f0f0;
+}
